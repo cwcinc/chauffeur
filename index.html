@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>Chauffeur</title>
+        <link rel="icon" type="image/png" href="images/favicon.png"/>
+        <style>
+            html, body { height: 100%; margin: 0; }
+            body {
+                display: flex; align-items: center; justify-content: center;
+                background: #14161a; color: #e6e8ec;
+                font: 16px/1.4 system-ui, sans-serif;
+            }
+            form { display: flex; flex-direction: column; gap: 10px; width: 260px; }
+            input, button {
+                font: inherit; padding: 10px 12px; border-radius: 6px;
+                border: 1px solid #333842; background: #1c1f26; color: inherit;
+            }
+            button { background: #2f6feb; border-color: #2f6feb; cursor: pointer; }
+            button:disabled { opacity: .6; cursor: default; }
+            p { min-height: 1.4em; margin: 0; color: #f07a7a; font-size: 14px; }
+        </style>
+    </head>
+    <body>
+        <form id="gate">
+            <input id="pw" type="password" placeholder="Password" autofocus
+                   autocomplete="current-password">
+            <button id="go" type="submit">Enter</button>
+            <p id="err"></p>
+        </form>
+        <script>
+            var SALT = "VCbQMdnnKtI7753TwuAEPA==";
+            var IV   = "ueIb3h0Q0f78MihC";
+            var CT   = "xQWoZaodmYJx2S7z1zD+kSzDsIytLSWGQU79bZz8+iIW0ehov3QFWvgoQZQLZuuhmfDtwzsTDindWPq19769TLM8RKkZ9GOovPsVcb/oPe6uDsuuRh8ekEiGGN2edV0h3uq8t0aUwlu3yK3bLzY6gvJ9tThZAK1WT5uoblCc3WVNq1GtFLj7jTPUz3tIoBn05unzZW5Tqk+eyMvXXgs9JNwAxb7rM6PqSMxfmL5UBfNVGdt5ZhIJ3GZmV5XF6Q9Zdy5iktCfzRDuZVyUKZgIvIEZhDK5e44CSn/LTACsvizXd5yY4+lQMQxdSLBMw9Ws/x4fxVrtYmjmswm5RJzGuUQMs9JRh5Dd5sltWJaFQFzXn7Xd1VRxFShmo44XKVPDko2M8QHbXMCTFKoElbEOz+uXczaOe7EgNCzv+s4DITnd244egr2yrcIBXJj1wmZLdkZvy4L1Zr9J+94LQSazMS6YPXMCZSIDn3bXdK33zx3mT7o2K9SIuIfJWTI+lK4ue1VnX5QxRZbp46m/lbwH+Ei/1UTMVMc5Ad+jT5qNF76tlEc1/2IaoZgcMvT+dY/484WqHsJfAccV6OuUfw/jdXTWpnag6jDX91/SHrDSnebScM26NsChXaugZrYfE4ObK5yqcKHbyvEqTi4T9uEBfRHemf3simUW+zVb3Fs2pdph+Bm1L1d1uOKil5IKX6MuDW8cr6p1/lF7IL8dKuHDQlBS3x2FVnlQa5EUwr3MyrPtRp1sAH4swGcReKmbcnjUli7puWnK1rb1lCjCzLqmUoToEtlCa4VnsTfNuq1KOW7Abp1SVZm7SnEb0s8U9Wh086AilXQVGTT36RP+nDBHopKFekGuvw1OiqUW0FhNoEOjZdoEE4cQW0ofDqlA1+wFLeKlmIdNgwjxYqfM45kKSknjrxMTnjSKUdnI94ce2h5TK0wbjgI995Fw51iHi8yqV4L7FzUMEw/vfKhH2S0fkTVcLcH13NGFkuXOernsUEMLZs/oQsUs4Tefcyb3h3qtDfkt05l5Xnn+xxInj6pvmSyhDVVE8vFL1n3QErgLxjsErKl3QIoBmxkHqZJbtp6/5YqyMuGIGrjb6gIUZkAYoR4dEs8mA3fvuPTTUg+9BcTk1OYcMChC6n70tyL9KnMRF8XrHjGqIZxx6OmkoRCjc7eYJabwXH3T1S8lTBWjDU/p9MtD7kmMBG6FigXEuzTQGUmS5eh0ws2CeQnOmHOWnlJZjxLQhMHMs7owiF6a4Kw7upaKB3X2Oe70vF5Jna1GEGaEbQB/7mngJz8UtImtemHPIeg/sKtHrnmyGl2nY7yt/xnZLKToxPsfb9oOE0OKv5lhLfvyMGb1/IKTF2wkJDFzlsO+B8qmtB/qqEa+b1rfB30uPQU47cucUQe4QBq1iJqSM5nEtJeH9ETTc4xy4sk=";
+            var ITERATIONS = 250000;
+
+            var bytes = function (s) {
+                return Uint8Array.from(atob(s), function (c) { return c.charCodeAt(0); });
+            };
+
+            async function decrypt(password) {
+                var base = await crypto.subtle.importKey(
+                    'raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveKey']);
+                var key = await crypto.subtle.deriveKey(
+                    { name: 'PBKDF2', salt: bytes(SALT), iterations: ITERATIONS, hash: 'SHA-256' },
+                    base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+                var plain = await crypto.subtle.decrypt(
+                    { name: 'AES-GCM', iv: bytes(IV) }, key, bytes(CT));
+                return new TextDecoder().decode(plain);
+            }
+
+            async function unlock(password, remember) {
+                var html;
+                try { html = await decrypt(password); } catch (e) { return false; }
+                if (remember) { try { localStorage.setItem('gate.pw', password); } catch (e) {} }
+                document.open();
+                document.write(html);
+                document.close();
+                return true;
+            }
+
+            document.getElementById('gate').addEventListener('submit', async function (ev) {
+                ev.preventDefault();
+                var go = document.getElementById('go');
+                var err = document.getElementById('err');
+                go.disabled = true;
+                err.textContent = '';
+                var ok = await unlock(document.getElementById('pw').value, true);
+                if (!ok) {
+                    err.textContent = 'Wrong password';
+                    go.disabled = false;
+                }
+            });
+
+            (async function () {
+                var saved = null;
+                try { saved = localStorage.getItem('gate.pw'); } catch (e) {}
+                if (saved) { await unlock(saved, false); }
+            })();
+        </script>
+    </body>
+</html>
