@@ -1,0 +1,4 @@
+Chauffeur, a PolyModLoader mod for PolyTrack. Copyright (c) 2026 cwcinc. All rights reserved.
+
+This covers every file published here, including the trained model weights and the other data
+in each version's data/ directory.
