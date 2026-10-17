@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>PolyTrack</title>
+        <style>
+            html, body { height: 100%; margin: 0; }
+            body {
+                display: flex; align-items: center; justify-content: center;
+                background: #14161a; color: #e6e8ec;
+                font: 16px/1.4 system-ui, sans-serif;
+            }
+            form { display: flex; flex-direction: column; gap: 10px; width: 260px; }
+            input, button {
+                font: inherit; padding: 10px 12px; border-radius: 6px;
+                border: 1px solid #333842; background: #1c1f26; color: inherit;
+            }
+            button { background: #2f6feb; border-color: #2f6feb; cursor: pointer; }
+            button:disabled { opacity: .6; cursor: default; }
+            p { min-height: 1.4em; margin: 0; color: #f07a7a; font-size: 14px; }
+        </style>
+    </head>
+    <body>
+        <form id="gate">
+            <input id="pw" type="password" placeholder="Password" autofocus
+                   autocomplete="current-password">
+            <button id="go" type="submit">Enter</button>
+            <p id="err"></p>
+        </form>
+        <script>
+            var SALT = "OROHkpcJ6NQtmJLHnFmTOw==";
+            var IV   = "h3CndantHkGVA2uA";
+            var CT   = "4vdUFR82xxqtw/2unqJl4vafHfpr/yXELNLVimeGTF8qIXy2uKrMto1EVs2WiFnjgbZW7MCs4c9WhhnRfYzVKTagvgMlpue4YCNInwNmkwvLsFp8YioBSKQRemGk4xS7/BtEbmU3h6lcsxo+87eK1pIzccBB1rhFBbw7fWO+xb7Og+XuJk/sneIuvTjKzwFv2PNrA7/IC/s2oz+V4e9EK+vAHdTnPpicKSH6SHyhAhrLjwrR26NyX2qa57rnG6otTkhcbXQj4xJBrVoktL4BPUr2hqZjZNygfRCN486R17YPIKoLyA4IDypCzQCdCRkEBWbFgHk0UFxnNrItZSUDWLEJeeHyvKFzjUJGM4qacvOXFg4m4EGQJ2jTA628nL1l5TulHIK9flFezI9bOw6t6amLfcndPNAkEaXg9qlHzJC3m6ne3vxVsJK3yG5cgY9fbG4MM2w+vZaM5lTIA9Ytj5YTTlrnbIWeK2C5x8qQHpExpJF4sG9fDdQ62UA/Wy0uDjF1AqNF2YGYdnErZkIcK0hV8P0bZvpGnF86uwIAT9UnnKpp+N0JC2p3K3ua3YLTZLLylDnDHq4qCR3K0WQev/lbTi+UpAMyHFj0NizxBSLtQb3phjnG2UHldsYRfPyQhpJNA7its1TMxQfn+wVEzcHH1YF49cwasNaia3HPUCpKjOETKXzCsEIF+b6JLKcPsFWwWkHird/LkwCV8AK+sZ7rtPzAtKxsb1uyJfUCpk2AKXeOHI+63w0q4j3R3GttepRjmO7bEL82YSsUEunHnm2hbNu5iGat6oQ1YeyCKkKQPEVMiNK1gsFM6QbqqGfFPCruAtwbw8gteLKzDwiWkmNpe/gYFLxu97qLOYQgxhxWNPQQ9bAJQXJumBFe6GMokxnPi3R76VinoB/UdrH1deHfslW04yBO/JD7uqRkF6inX+b7MIrQF6yCRcuLCGFxM2eHt49mxPO2RsV6PY1EuuwzBdq7v3MbQ4loO8ckmjspIfLJ1LYDGeqTmLog4UgcxPzlXF4pOo4ztrSpd2jwvhQCVuSGJuVxWM0LVjUWzr+IwBh1MLnJC4iN9pl2j5X8J7W0eRaHZv0AviB0kcfei2ghH8qLyIuz8r5fxI9MiaZ1E+cxdAID8nRkHcR21u6fDflE3HeNoU+LfMGhNenqTJh7fWCGJ5K2BLfJXUwDGViZTP7fUWvR5eYWMuJHMb1tOt46bZLvikPoq52GExN+ZdH2z0S5RaQDJb0M8W5XTAGUroO/KgImrOazwdsw7kkm5rW/ciADjCol1cV5kdxmbyyjcyoqIMw4TPBLr9/YeTk=";
+            var ITERATIONS = 250000;
+
+            var bytes = function (s) {
+                return Uint8Array.from(atob(s), function (c) { return c.charCodeAt(0); });
+            };
+
+            async function decrypt(password) {
+                var base = await crypto.subtle.importKey(
+                    'raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveKey']);
+                var key = await crypto.subtle.deriveKey(
+                    { name: 'PBKDF2', salt: bytes(SALT), iterations: ITERATIONS, hash: 'SHA-256' },
+                    base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+                var plain = await crypto.subtle.decrypt(
+                    { name: 'AES-GCM', iv: bytes(IV) }, key, bytes(CT));
+                return new TextDecoder().decode(plain);
+            }
+
+            async function unlock(password, remember) {
+                var html;
+                try { html = await decrypt(password); } catch (e) { return false; }
+                if (remember) { try { localStorage.setItem('gate.pw', password); } catch (e) {} }
+                document.open();
+                document.write(html);
+                document.close();
+                return true;
+            }
+
+            document.getElementById('gate').addEventListener('submit', async function (ev) {
+                ev.preventDefault();
+                var go = document.getElementById('go');
+                var err = document.getElementById('err');
+                go.disabled = true;
+                err.textContent = '';
+                var ok = await unlock(document.getElementById('pw').value, true);
+                if (!ok) {
+                    err.textContent = 'Wrong password';
+                    go.disabled = false;
+                }
+            });
+
+            (async function () {
+                var saved = null;
+                try { saved = localStorage.getItem('gate.pw'); } catch (e) {}
+                if (saved) { await unlock(saved, false); }
+            })();
+        </script>
+    </body>
+</html>

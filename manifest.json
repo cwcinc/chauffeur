@@ -1,0 +1,27 @@
+{
+  "name": "Chauffeur",
+  "icons": [
+    {
+      "src": "images/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "background_color": "#28346a",
+  "theme_color": "#28346a",
+  "start_url": "./index.html",
+  "orientation": "landscape",
+  "display_override": [
+    "fullscreen",
+    "standalone",
+    "minimal-ui"
+  ],
+  "display": "fullscreen",
+  "author": "<span>cwcinc</span><style>[id=\"mod:ptai\"]{background-image:linear-gradient(90deg,transparent 55%,#112052 85%),repeating-linear-gradient(115deg,transparent 0 18px,#b3c1ff14 18px 21px)!important}[id=\"mod:ptai\"]::before{content:\"\";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,#b3c1ffcc,#b3c1ff22 70%);clip-path:polygon(evenodd,0 0,100% 0,calc(100% - 8px) 100%,0 100%,0 0,2px 2px,calc(100% - 2.2px) 2px,calc(100% - 10px) calc(100% - 2px),2px calc(100% - 2px),2px 2px)}[id=\"mod:ptai\"]>div>p:first-child{color:transparent!important;-webkit-text-stroke:1px #b3c1ff;text-shadow:0 0 10px #b3c1ff99}[id=\"mod:ptai\"]>div>p:first-child u{text-decoration:none;font-size:17px;padding:3px 8px;margin-left:6px;border:1px solid #b3c1ff66;background:#b3c1ff1f;border-radius:10px;vertical-align:middle;-webkit-text-stroke:0;text-shadow:none;color:#b3c1ff!important}[id=\"mod:ptai\"]>div>p:nth-of-type(2)>span{background:linear-gradient(90deg,#ff4d5e,#d8dce6,#ff4d5e) 0 0/200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:ptai-author 4s linear infinite}@keyframes ptai-author{to{background-position:-200% 0}}</style>",
+  "id": "ptai",
+  "latest": {
+    "0.6.3": "1.2.0"
+  },
+  "copyright": "Copyright (c) 2026 cwcinc. All rights reserved."
+}
