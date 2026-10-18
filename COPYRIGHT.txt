@@ -1,0 +1,8 @@
+Chauffeur, a PolyModLoader mod for PolyTrack. Copyright (c) 2026 cwcinc. All rights reserved.
+
+This covers Chauffeur's mod files: the mod in each version directory, including the trained model
+weights and the other data in its data/ directory, and on the web site ai_mod/, the Chauffeur logo
+and icons, the menu music and Chauffeur's changes to the game's bundles.
+
+PolyTrack itself - the code, audio, models, images and tracks - is Kodub's
+(https://www.kodub.com) and is not covered by this notice.

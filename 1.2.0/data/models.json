@@ -1,0 +1,21 @@
+{
+ "order": [
+  "farhint",
+  "rayonly"
+ ],
+ "default": "farhint",
+ "models": {
+  "farhint": {
+   "arch": "v3",
+   "obsDim": 897,
+   "rayDim": 840,
+   "gateObs": "world"
+  },
+  "rayonly": {
+   "arch": "v3",
+   "obsDim": 897,
+   "rayDim": 840,
+   "gateObs": "world"
+  }
+ }
+}
