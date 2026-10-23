@@ -1,0 +1,8 @@
+{
+  "targets": [
+    "0.6.3"
+  ],
+  "dependencies": [],
+  "main": "main.mod.js",
+  "copyright": "Copyright (c) 2026 cwcinc. All rights reserved."
+}
